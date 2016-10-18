@@ -7,5 +7,5 @@ View comments in code for more TODOs.
 
 Screenshot:
 
-![alt tag](http://i.imgur.com/uAAv4Gb.png)
+![Text Adventure](http://i.imgur.com/uAAv4Gb.png)
 
