@@ -4,7 +4,7 @@ Text Adventure for Python 2.7
 
 A simple, work-in-progress, free and open source text adventure for beginners and hobbyists.
 
-Last update 1/1/2017:
+Last update 1/2/2017:
 - Added save/load game functionality
 - Added functionality for drop
 - Cleaned up code a bit
