@@ -21,6 +21,7 @@ TO DO:
 import sys
 import string
 import pickle
+import glob
 
 class Player:
     def __init__(self, name, inventory):
@@ -121,12 +122,21 @@ def drop(inventory, item, itemlist, room):
         print "You don't have that."
 
 def savegame(x, y, player, world, room):
-    with open('savedgame.pkl', 'w') as f:
+    print "Current saved games:"
+    savedgames = glob.glob('*.pkl')
+    for games in savedgames:
+        print games[0:-4]
+    filename = raw_input("Enter name for saved game: ")
+    with open(filename + '.pkl', 'w') as f:
         pickle.dump([player, world, room, x, y], f)
         print "Save successful."
 
 def loadgame(world, room, x, y, player, commands, directions, gamehelp):
-    with open('savedgame.pkl') as f:
+    savedgames = glob.glob('*.pkl')
+    for games in savedgames:
+        print games[0:-4]
+    filename = raw_input("Choose a game to load: ")
+    with open(filename + '.pkl') as f:
         player, world, room, x, y = pickle.load(f)
         print "Load successful.\n"
         game(world, room, x, y, player, commands, directions, gamehelp)
@@ -142,13 +152,13 @@ world = [[Room("", "", "") for n in range(MAP_WIDTH)] for m in range(MAP_HEIGHT)
 world[0][0] = Room("Bedroom", "You are in your childhood bedroom.",
                    {"wallet": "Your wallet is empty. Are you surprised?",
                     "keys": "The key ring holds a house key and a car key."})
-world[0][1] = Room("Bathroom", "You step into the bathroom.",
+world[0][1] = Room("Bathroom", "The place where you have spent a significant portion of your life.",
                    {"magazine": "Tentacle's Health: Top 10 Ways to Buff Your Suckers",
                     "toilet paper": "You never know when you might need it."})
 world[1][0] = Room("Kitchen", "You have fond memories of your mother cooking meals here.",
                    {"apple": "It's a Fuji apple.",
                     "chainsaw": "The perfect tool for cutting down trees and dismembering bodies."})
-world[1][1] = Room("Garage", "You are now standing in the garage.",
+world[1][1] = Room("Garage", ".",
                    {"car": "The light glistens off the layer of dust on your 1989 Honda Civic hatchback.",
                     "gasoline": "The gas can is red."})
 
