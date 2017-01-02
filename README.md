@@ -19,5 +19,5 @@ To do:
 
 
 Screenshot:
-![Text Adventure](http://i.imgur.com/uAAv4Gb.png)
+![Text Adventure](http://i.imgur.com/bLrlGQJ.gif)
 
