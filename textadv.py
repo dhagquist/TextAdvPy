@@ -153,6 +153,7 @@ world[1][1] = Room("Garage", "You are now standing in the garage.",
                     "gasoline": "The gas can is red."})
 
 # Set up game parameters
+global player
 x, y = 0, 0
 room = world[x][y]
 directions = ["n", "e", "s", "w"]
@@ -217,7 +218,7 @@ def menu():
         if userinput == "n":
             name = raw_input("\nPlease enter your name: ")
             inventory = {}
-            global player
+            # global player
             player = Player(name, inventory)
             print "Hello, {}.\n".format(player.name)
             room.printlocation()
@@ -226,7 +227,7 @@ def menu():
             game(world, room, x, y, player, commands, directions, gamehelp)
             break
         elif userinput =="l":
-            global player
+            # global player
             player = Player("", {})
             loadgame(world, room, x, y, player, commands, directions, gamehelp)
             break
