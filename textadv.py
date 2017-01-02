@@ -1,11 +1,26 @@
-# Text Adventure
+'''
+Text Adventure for Python
 
-# TO DO:
-# -add drop support for inventory items
-# -pretty print for room items and inventory
+A simple, work-in-progress, free and open source text adventure
+for beginners and hobbyists.
+
+Last updated 1/1/2017
+-Added save/load game functionality
+-Added functionality for drop
+-Cleaned up code a bit
+
+TO DO:
+------
+-Keep text for rooms, descriptions, commands, etc. in a separate file (JSON, YAML, etc.)
+-Add states and actions to rooms, e.g. open/close window
+-Pretty print for room items and inventory
+-"look keys, wallet" --> "Your wallet is empty.". Assume user error, or add check?
+-Add support for multiple item drop?
+'''
 
 import sys
 import string
+import pickle
 
 class Player:
     def __init__(self, name, inventory):
@@ -19,6 +34,8 @@ class Room:
         self.name = name
         self.description = description
         self.items = items
+    def additem(self, item):
+        self.items.push(item)
     def removeitem(self, item):
         self.items.pop(item)
     def printlocation(self):
@@ -29,22 +46,13 @@ class Room:
         else:
             print "You see nothing of interest."
 
-def titlescreen():
-    print "+---------------------------+"
-    print "| Text Adventure for Python |"
-    print "+---------------------------+"
-    print
-
 def getuserinput():
-    # Issue: "look keys, wallet" --> "Your wallet is empty."
-    #   Assume user error, or add check?
     command = ""
     item = ""
     itemlist = []
     removewords = ["at", "the", "to"]
     userinput = raw_input("> ").lower()
     userinput = userinput.strip()
-    # Command + Item processing
     # Get the command
     if len(userinput.split()) > 1:
         command = userinput[:userinput.index(" ")]
@@ -53,8 +61,7 @@ def getuserinput():
         # Get everything after the command
         rest = userinput[userinput.index(" ") + 1:]
         rest = rest.strip()
-        # Process multiple items for get command (e.g. get keys, wallet)
-        # Should this be in the get function?
+        # Check if multiple items for get command (e.g. get keys, wallet)
         if "," in rest:
             rest = rest.split(",")
             for item in rest:
@@ -74,9 +81,6 @@ def getuserinput():
         item = itemlist[0]
     # Remove extraneous words (e.g. "at", "the", "to")
     itemlist = [word for word in itemlist if word not in removewords]
-    # Test: check captured command and items
-    print "Command: " + command
-    print "Items: " + str(itemlist)
     return command, itemlist, item
 
 def move(command, x, y):
@@ -85,16 +89,14 @@ def move(command, x, y):
         if y > 0: y -= 1
         else: print nogo
     elif command == "s":
-        if y < map_height - 1: y += 1
+        if y < MAP_HEIGHT - 1: y += 1
         else: print nogo
     elif command == "e":
         if x > 0: x -= 1
         else: print nogo
     elif command == "w":
-        if x < map_width - 1: x += 1
+        if x < MAP_WIDTH - 1: x += 1
         else: print nogo
-    print "x: " + str(x)
-    print "y: " + str(y)
     return x, y
 
 def get(inventory, item, itemlist, room):
@@ -109,65 +111,34 @@ def get(inventory, item, itemlist, room):
         else:
             print "You don't see that here."
 
-def drop():
-    # To do
-    print
-
-def savegame(x, y, inventory, name):
-    import pickle
-    xtemp, ytemp, i = 0, 0, 0
-    roomlist = []
-    for i in range(map_width - 1):
-        roomlist.append(world[xtemp][ytemp])
-        xtemp += 1
-        for j in range(map_height - 1):
-            roomlist.append(world[xtemp][ytemp])
-            ytemp +=1
-    print roomlist
-    data = {"x": x, "y": y, "name": name, "inventory": inventory, "rooms": roomlist}
-    filehandler = open("savedgame.txt","wb")
-    pickle.dump(data, filehandler)
-    filehandler.close()
-    print "Save successful."
-
-def loadgame():
-    # Issue: JSON parses strings in unicode, so a "u" will appear before loaded inventory items
-    #   Possible work-around: use a pretty print method for printing inventory and room items
-    # Issue: if save, then get item, then load, item disappears (not in inv, but taken from room)
-    #   Need to save room states
-    #    Create list of variables to load data into, use for loop to iterate through?
-    import os.path
-    import pickle
-    if os.path.isfile("savedgame.txt"):
-        loadfile = open("savedgame.txt",'rb')
-        data = pickle.load(file)
-        file.close()
-        global x
-        global y
-        x = data2["x"]
-        y = data2["y"]
-        name = data2["name"]
-        inventory = data2["inventory"]
-        print inventory
-        print str(inventory)
-        global Player
-        player = Player(name, inventory)
-        print "Load successful.\n"
-        room = world[x][y]
-        room.printlocation()
-        room.printitems()
-        print
-        game(world, room, x, y, player, commands, directions, gamehelp)
+def drop(inventory, item, itemlist, room):
+    if item in inventory:
+        tuple = {item: inventory[item]}
+        inventory.pop(item)
+        room.items.update(tuple)
+        print "You drop the " + str(item) + "."
     else:
-        print "No saved game exists."
-        
+        print "You don't have that."
 
-# Build rooms, load into map
-# TO DO:
-# -Add states and actions to rooms, e.g. open window
-# -Keep all data in separate file (YAML?)
-map_width, map_height = 2, 2
-world = [[Room("", "", "") for n in range(map_width)] for m in range(map_height)]
+def savegame(x, y, player, world, room):
+    with open('savedgame.pkl', 'w') as f:
+        pickle.dump([player, world, room, x, y], f)
+        print "Save successful."
+
+def loadgame(world, room, x, y, player, commands, directions, gamehelp):
+    with open('savedgame.pkl') as f:
+        player, world, room, x, y = pickle.load(f)
+        print "Load successful."
+        game(world, room, x, y, player, commands, directions, gamehelp)
+
+def titlescreen():
+    print "+---------------------------+"
+    print "| Text Adventure for Python |"
+    print "+---------------------------+"
+
+# Create world/map, initialize and build rooms inside of map 
+MAP_WIDTH, MAP_HEIGHT = 2, 2
+world = [[Room("", "", "") for n in range(MAP_WIDTH)] for m in range(MAP_HEIGHT)]
 world[0][0] = Room("Bedroom", "You are in your childhood bedroom.",
                    {"wallet": "Your wallet is empty. Are you surprised?",
                     "keys": "The key ring holds a house key and a car key."})
@@ -185,17 +156,20 @@ world[1][1] = Room("Garage", "You are now standing in the garage.",
 x, y = 0, 0
 room = world[x][y]
 directions = ["n", "e", "s", "w"]
-commands = ["look", "get", "open", "close", "i", "help", "load", "save", "quit", "exit"]
+commands = ["look", "get", "drop", "open", "close", "i", "help", "load", "save", "quit", "exit"]
 gamehelp = """
+Instructions:
 Type n/e/s/w to move your player
 Type i to view your inventory 
 Type get + the item to pick up an item
 Type get + multiple items separated by commas
 Type quit to quit the game
+Some common commands:
+look, get, open, close, load, save, help, quit
 """
 
-# Print title screen
 titlescreen()
+print gamehelp
 
 def game(world, room, x, y, player, commands, directions, gamehelp):
     while True:
@@ -218,14 +192,16 @@ def game(world, room, x, y, player, commands, directions, gamehelp):
                     print "You don't see that here."
             elif command == "get":
                 get(player.inventory, item, itemlist, room)
+            elif command == "drop":
+                drop(player.inventory, item, itemlist, room)
             elif command == "i":
                 player.printinventory()
             elif command == "help":
                 print gamehelp
             elif command == "load":
-                loadgame()
+                loadgame(world, room, x, y, player, commands, directions, gamehelp)
             elif command == "save":
-                savegame(x, y, player.inventory, player.name)
+                savegame(x, y, player, world, room)
             elif command == "quit":
                 print "Goodbye.\n"
                 sys.exit()
@@ -236,12 +212,9 @@ def game(world, room, x, y, player, commands, directions, gamehelp):
         print
 
 def menu():
-    # New game / Load game
-    # Note: load game currently in development
     userinput = raw_input("(N)ew Game or (L)oad Game? ").lower()
     while True:
         if userinput == "n":
-            # Create player
             name = raw_input("\nPlease enter your name: ")
             inventory = {}
             global player
@@ -253,11 +226,13 @@ def menu():
             game(world, room, x, y, player, commands, directions, gamehelp)
             break
         elif userinput =="l":
-            loadgame()
+            global player
+            player = Player("", {})
+            loadgame(world, room, x, y, player, commands, directions, gamehelp)
             break
         else:
             print "Invalid input."
             userinput = raw_input("(N)ew Game or (L)oad Game? ").lower()
 
-# Start game
-menu()
+if __name__ == "__main__":
+    menu()
