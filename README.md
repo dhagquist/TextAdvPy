@@ -17,5 +17,7 @@ To do:
 - "look keys, wallet" --> "Your wallet is empty.". Assume user error, or add check?
 - Add support for multiple item drop?
 
+
+Screenshot:
 ![Text Adventure](http://i.imgur.com/uAAv4Gb.png)
 
