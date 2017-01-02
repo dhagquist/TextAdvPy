@@ -20,5 +20,4 @@ To do:
 
 Screenshot:
 
-![Text Adventure](http://i.imgur.com/bLrlGQJ.gif)
-
+![Text Adventure](http://i.imgur.com/N9kHLWl.gif)
