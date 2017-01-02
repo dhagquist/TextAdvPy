@@ -11,15 +11,10 @@ Last update 1/1/2017:
 
 
 To do:
-
 - Keep text for rooms, descriptions, commands, etc. in a separate file (JSON, YAML, etc.)
-
 - Add states and actions to rooms, e.g. open/close window
-
 - Pretty print for room items and inventory
-
 - "look keys, wallet" --> "Your wallet is empty.". Assume user error, or add check?
-
 - Add support for multiple item drop?
 
 ![Text Adventure](http://i.imgur.com/uAAv4Gb.png)
