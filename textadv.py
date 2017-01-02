@@ -1,5 +1,5 @@
 '''
-Text Adventure for Python
+Text Adventure for Python 2.7
 
 A simple, work-in-progress, free and open source text adventure
 for beginners and hobbyists.
