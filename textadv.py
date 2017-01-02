@@ -128,7 +128,7 @@ def savegame(x, y, player, world, room):
 def loadgame(world, room, x, y, player, commands, directions, gamehelp):
     with open('savedgame.pkl') as f:
         player, world, room, x, y = pickle.load(f)
-        print "Load successful."
+        print "Load successful.\n"
         game(world, room, x, y, player, commands, directions, gamehelp)
 
 def titlescreen():
